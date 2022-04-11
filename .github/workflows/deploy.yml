@@ -28,8 +28,5 @@ jobs:
            git remote set-url origin https://GhostVaibhav:${{ secrets.PASS }}@github.com/GhostVaibhav/android-project.git
            git config --global user.email "48472541+GhostVaibhav@users.noreply.github.com"
            git config --global user.name "Vaibhav Sharma"
-    - name: Writing to environment variable
-      run: |
-           npm run build
     - name: Building and deploying the site
       run: npm run deploy
