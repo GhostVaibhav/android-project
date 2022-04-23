@@ -15,26 +15,19 @@ function App() {
 	var encrypted = null;
 	function encrypt() {
 		let message = document.querySelector(".message").value;
-		console.log(message);
 		let x = document.querySelector(".public-key-data").value.replace(/\n/g, '');
 		let xMod = x.slice(27);
 		let xMod2 = xMod.slice(0, -25);
 		x = '-----BEGIN PUBLIC KEY-----\n' + xMod2 + '-----END PUBLIC KEY-----\n';
 		x = forge.pki.publicKeyFromPem(x);
-		console.log(x);
 		let e = crypt.encrypt(x, message);
 		document.querySelector(".cipherText").innerHTML = JSON.stringify(e);
 		document.querySelector('.cipher-text-output').classList.remove("hidden");
 	}
 	function decryption() {
-		console.log("Hello decryption");
 		let mod = document.querySelector(".textCipher-rec").value;
 		let twice_json = JSON.parse(mod);
 		let enc = JSON.parse(twice_json);
-		console.log(enc);
-		let encrypted = JSON.parse(mod);
-		console.log("Parsed JSON");
-		console.log(encrypted);
 		let e = crypt.decrypt(privKeyPEM, JSON.stringify(enc));
 		document.querySelector(".cipher-text-output-rec").classList.remove("hidden");
 		document.querySelector(".cipherText-rec").innerHTML = e.message;
