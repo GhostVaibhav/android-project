@@ -10,7 +10,7 @@ export default function Sender(props) {
                 <div className='public-key text-xl font-semibold'>
                     Public key of receiver
                 </div>
-                <textarea className='flex items-center mx-16 p-2 public-key-data w-11/12 outline-none overflow-auto h-44 border text-black border-white rounded-lg' />
+                <textarea className='flex resize-none items-center mx-16 p-2 public-key-data w-11/12 outline-none overflow-auto h-44 border text-black border-white rounded-lg' />
                 <div className='m-2'>
                     Message: <input className='border rounded-md p-1 text-black outline-none message'></input>
                 </div>
