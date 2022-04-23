@@ -2,47 +2,51 @@ import './App.css';
 import { Crypt } from 'hybrid-crypto-js';
 import Sender from './components/Sender';
 import Receiver from './components/Receiver';
+import { Routes, Route, HashRouter as Router } from "react-router-dom";
 
 function App() {
 	var forge = require('node-forge');
 	var crypt = new Crypt();
 	var pki = forge.pki;
 	var rsa = forge.pki.rsa;
-	var message = "";
-	var keypair = rsa.generateKeyPair({ bits: 2048, e: 0x10001 });
+	var keypair = rsa.generateKeyPair({ bits: 4096, e: 0x10001 });
 	var pubKeyPEM = pki.publicKeyToPem(keypair.publicKey);
 	var privKeyPEM = pki.privateKeyToPem(keypair.privateKey);
 	var encrypted = null;
-	var decrypt = null;
-	function generateKeys() {
-		if (document.querySelector(".message").value !== "") {
-			message = document.querySelector(".message").value;
-			encrypted = crypt.encrypt(pubKeyPEM, message);
-			document.querySelector(".keys").innerHTML = JSON.stringify(JSON.parse(encrypted).keys).substring(0, 100);
-			document.querySelector(".cipherText").innerHTML = JSON.parse(encrypted).cipher;
-			document.querySelector('.cipher-text-output').classList.remove("hidden");
-			document.querySelector(".cipherText-rec").innerHTML = JSON.parse(encrypted).cipher;
-			document.querySelector('.cipher-text-output-rec').classList.remove("hidden");
-			document.querySelector('.message-received').classList.remove("hidden");
-			decrypt = crypt.decrypt(privKeyPEM, encrypted);
-			message = decrypt.message;
-			document.querySelector(".message-rec").innerHTML = message;
-		}
+	function encrypt() {
+		let message = document.querySelector(".message").value;
+		console.log(message);
+		let x = document.querySelector(".public-key-data").value.replace(/\n/g, '');
+		let xMod = x.slice(27);
+		let xMod2 = xMod.slice(0, -25);
+		x = '-----BEGIN PUBLIC KEY-----\n' + xMod2 + '-----END PUBLIC KEY-----\n';
+		x = forge.pki.publicKeyFromPem(x);
+		console.log(x);
+		let e = crypt.encrypt(x, message);
+		document.querySelector(".cipherText").innerHTML = JSON.stringify(e);
+		document.querySelector('.cipher-text-output').classList.remove("hidden");
 	}
-	function randomKeys() {
-		keypair = rsa.generateKeyPair({ bits: 2048, e: 0x10001 });
-		pubKeyPEM = pki.publicKeyToPem(keypair.publicKey);
-		privKeyPEM = pki.privateKeyToPem(keypair.privateKey);
-		document.querySelector(".public-key-data").innerHTML = pubKeyPEM.substring(0, 250);
-		document.querySelector(".private-key-data").innerHTML = privKeyPEM.substring(0, 250);
+	function decryption() {
+		console.log("Hello decryption");
+		let mod = document.querySelector(".textCipher-rec").value;
+		let twice_json = JSON.parse(mod);
+		let enc = JSON.parse(twice_json);
+		console.log(enc);
+		let encrypted = JSON.parse(mod);
+		console.log("Parsed JSON");
+		console.log(encrypted);
+		let e = crypt.decrypt(privKeyPEM, JSON.stringify(enc));
+		document.querySelector(".cipher-text-output-rec").classList.remove("hidden");
+		document.querySelector(".cipherText-rec").innerHTML = e.message;
 	}
 	return (
 		<div className="App">
-			{/* {JSON.parse(encrypted).cipher} */}
-			<div className='flex w-screen'>
-				<Sender publicKey={pubKeyPEM} privateKey={privKeyPEM} cipher={encrypted} generate={generateKeys} random={randomKeys} />
-				<Receiver publicKey={pubKeyPEM} privateKey={privKeyPEM} cipher={encrypted} />
-			</div>
+			<Router>
+				<Routes>
+					<Route path="/" element={<Sender publicKey={pubKeyPEM} privateKey={privKeyPEM} cipher={encrypted} encrypt={encrypt} />} />
+					<Route path="/r" element={<Receiver publicKey={pubKeyPEM} privateKey={privKeyPEM} cipher={encrypted} decrypt={decryption} />} />
+				</Routes>
+			</Router>
 		</div>
 	);
 }
